@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Test.h"
+#include <algo/Test.h>
 
-class Tour {
-public:
-    Tour(const Test& test) {
-    }
-};
+namespace NAlgo {
+    class Tour {
+    public:
+        Tour(const Test &test) {
+        }
+    };
+}

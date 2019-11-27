@@ -1,21 +1,31 @@
 #pragma once
 
-#include "Test.h"
-#include "Tour.h"
+#include <algo/Tour.h>
 #include <string>
 
-class ISolution {
-public:
-    ISolution(Test test)
-        : test(test)
-    {}
+namespace NAlgo {
+    class ISolution {
+    public:
+        explicit ISolution(int version)
+            : version(version)
+        {}
+        virtual ~ISolution() = default;
 
-    virtual Tour solve() = 0;
+        virtual Tour solve(Test test) = 0;
 
-    /*
-        Возвращает название алгоритма решения.
-     */
-    virtual std::string solution_name() = 0;
-private:
-    Test test;
-};
+        /*
+            Возвращает название алгоритма решения.
+         */
+        virtual std::string solution_name() const = 0;
+
+        int solution_version() const {
+            return version;
+        }
+    protected:
+        int version;
+    };
+
+    enum class ESolution : int {
+        NearestNeighbour
+    };
+}
