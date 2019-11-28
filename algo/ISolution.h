@@ -11,7 +11,7 @@ namespace NAlgo {
         {}
         virtual ~ISolution() = default;
 
-        virtual Tour solve(Test test) = 0;
+        virtual Tour solve(const Test& test) = 0;
 
         /*
             Возвращает название алгоритма решения.

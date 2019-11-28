@@ -2,6 +2,8 @@
 #include <cxxopts.hpp>
 #include <runner/SolutionsRunner.h>
 
+// ./tsp --mode run-solution --solution-name NearestNeighbour --test-name a280
+
 int main(int argc, char** argv) {
     cxxopts::Options opt_parser("TSP solver", "");
     opt_parser.allow_unrecognised_options();

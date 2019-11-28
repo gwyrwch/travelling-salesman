@@ -29,7 +29,15 @@ namespace NRunner {
         }
     private:
         void save(const std::vector<TestResult>& testResults) {
-            // TODO узнанть имя файла и сохранить этот результат
+            for (auto result : testResults) {
+                std::filesystem::path path(
+                    NConfig::CacheConfig::CACHE_DIRECTORY / (
+                        solution->solution_name() + "_" + std::to_string(solution->solution_version()) + "_" + test_name + ".tour"
+                    )
+                );
+                std::ofstream out(path);
+                out << "WEIGHT: " << result.tour.TotalWeight() << std::endl;
+            }
         }
 
         std::vector<TestResult> run() {
