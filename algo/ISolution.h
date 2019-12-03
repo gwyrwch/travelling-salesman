@@ -26,6 +26,10 @@ namespace NAlgo {
     };
 
     enum class ESolution : int {
-        NearestNeighbour
+        NearestNeighbour,
+        NaiveSolution,
+        MinimumSpanningTree,
+
+        INVALID_SOLUTION_NAME
     };
 }

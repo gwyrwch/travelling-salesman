@@ -1,13 +1,23 @@
 #pragma once
 
 #include <algo/NearestNeighbour.h>
+#include <algo/NaiveSolution.h>
+#include <algo/MinimumSpanningTree.h>
+
 #include <config/CacheConfig.h>
 #include <fstream>
 
+
 namespace NAlgo {
     ESolution ParseSolutionName(const std::string& solution_name) {
-        // todo:
-        return ESolution::NearestNeighbour;
+        if (solution_name == "NearestNeighbour") {
+            return ESolution::NearestNeighbour;
+        } else if (solution_name == "NaiveSolution") {
+            return ESolution::NaiveSolution;
+        } else if (solution_name == "MinimumSpanningTree") {
+            return ESolution::MinimumSpanningTree;
+        }
+        return ESolution::INVALID_SOLUTION_NAME;
     }
 
     int GetSolutionVersion(const std::string& solution_name) {
@@ -36,6 +46,10 @@ namespace NAlgo {
         switch (solution_code) {
             case ESolution::NearestNeighbour:
                 return std::make_unique<NearestNeighbour>(version);
+            case ESolution::NaiveSolution:
+                return std::make_unique<NaiveSolution>(version);
+            case ESolution::MinimumSpanningTree:
+                return std::make_unique<MinimumSpanningTree>(version);
             default:
                 return nullptr;
         }
