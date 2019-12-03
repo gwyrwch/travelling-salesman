@@ -33,7 +33,6 @@ namespace NAlgo {
                 }
             } while(std::next_permutation(v.begin(), v.end()));
 
-
             return tour;
         }
 
