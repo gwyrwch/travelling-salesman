@@ -22,7 +22,7 @@ namespace NAlgo {
         std::string line;
         while (true) {
             getline(test_in, line);
-            if (line == "NODE_COORD_SECTION") {
+            if (line == "NODE_COORD_SECTION" || line == "EDGE_WEIGHT_SECTION") {
                 break;
             }
 
@@ -42,12 +42,16 @@ namespace NAlgo {
             } else if (tokens[0] == "EDGE_WEIGHT_TYPE") {
                 distance_function = MakeDistanceFunction(tokens[1]);
                 weight_type = tokens[1];
-            } else {
+            } else if(tokens[0] == "EDGE_WEIGHT_FORMAT") {
+                weight_format = tokens[1];
+            } else if (tokens[0] == "DISPLAY_DATA_TYPE") {
+                // todo check tokens[1]
+            } else  {
                 throw std::runtime_error("Unknown field in test " + line);
             }
         }
 
-        if (weight_type == "EUC_2D") {
+        if (weight_type == "EUC_2D" || weight_type == "ATT" || weight_type == "CEIL_2D") {
             points.resize(vertex_num);
             for (int i = 0; i < vertex_num; i++) {
                 int vertex, x, y;
@@ -56,6 +60,29 @@ namespace NAlgo {
                 }
                 points[--vertex] = {x, y};
             }
+        } else if  (weight_type == "EXPLICIT") {
+            if (weight_format == "FULL_MATRIX") {
+                for (int i = 0; i < vertex_num; i++) {
+                    std::vector<int> l;
+                    for (int j = 0; j < vertex_num; j++) {
+                        int w;
+                        if (!(test_in >> w)) {
+                            throw std::runtime_error("unexpected end of file");
+                        }
+                        l.push_back(w);
+                    }
+                    matrix.push_back(l);
+                }
+            } else if (weight_format == "UPPER_ROW") {
+                matrix.assign(vertex_num, std::vector<int>(vertex_num, 0));
+                for (int i = 0; i < vertex_num; i++) {
+                    for (int j = i + 1; j < vertex_num; j++) {
+                        test_in >> matrix[i][j];
+                        matrix[j][i] = matrix[i][j];
+                    }
+                }
+            }
+
         }
 
         // TODO: ENSURE getline ==  EOF
