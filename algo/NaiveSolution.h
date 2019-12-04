@@ -39,7 +39,6 @@ namespace NAlgo {
         std::string solution_name() const override  {
             return "NaiveSolution";
         }
-
     };
 }
 

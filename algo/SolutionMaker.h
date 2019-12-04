@@ -3,6 +3,7 @@
 #include <algo/NearestNeighbour.h>
 #include <algo/NaiveSolution.h>
 #include <algo/MinimumSpanningTree.h>
+#include <algo/LocalSearch.h>
 
 #include <config/CacheConfig.h>
 #include <fstream>
@@ -18,6 +19,13 @@ namespace NAlgo {
             return ESolution::MinimumSpanningTree;
         }
         return ESolution::INVALID_SOLUTION_NAME;
+    }
+
+    EOptimizer ParseOptimizerName(const std::string& optimizer_name) {
+        if (optimizer_name == "LocalSearch") {
+            return EOptimizer::LocalSearch;
+        }
+        throw;
     }
 
     int GetSolutionVersion(const std::string& solution_name) {
@@ -50,6 +58,20 @@ namespace NAlgo {
                 return std::make_unique<NaiveSolution>(version);
             case ESolution::MinimumSpanningTree:
                 return std::make_unique<MinimumSpanningTree>(version);
+            case ESolution::INVALID_SOLUTION_NAME:
+                throw std::runtime_error("Invalid solution name");
+            default:
+                return nullptr;
+        }
+    }
+
+    std::unique_ptr<IOptimizer> MakeOptimizer(const std::string& optimizer_name, OptimizerConfig config) {
+        EOptimizer optimizer_code = ParseOptimizerName(optimizer_name);
+        int version = GetSolutionVersion(optimizer_name);
+
+        switch (optimizer_code) {
+            case EOptimizer::LocalSearch:
+                return std::make_unique<LocalSearch>(version, std::move(config));
             default:
                 return nullptr;
         }
