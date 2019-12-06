@@ -14,7 +14,7 @@ namespace NAlgo {
         }
 
         std::string optimizer_name() const override  {
-            return "LocalSearch";
+            return "GeneticAlgorithm";
         }
 
     private:

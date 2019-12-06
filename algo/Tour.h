@@ -22,6 +22,10 @@ namespace NAlgo {
             }
         }
 
+        std::string GetTestName()  {
+            return test.GetTestName();
+        }
+
         std::vector<int> path;
     private:
         int64_t total_weight;

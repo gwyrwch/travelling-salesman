@@ -28,6 +28,11 @@ namespace NAlgo {
         int64_t EvalDistance(int u, int v) const {
             return distance_function(*this, u, v);
         }
+
+        std::string GetTestName() {
+            return name;
+        }
+
     private:
         void ParseTestFromFile(std::istream& test_in);
 

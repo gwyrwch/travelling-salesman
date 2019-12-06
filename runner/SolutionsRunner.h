@@ -55,14 +55,28 @@ namespace NRunner {
             for (auto result : testResults) {
                 std::filesystem::path path(
                     NConfig::CacheConfig::CACHE_DIRECTORY / (
-                        solution->solution_name() + "_" + std::to_string(solution->solution_version()) + "_" + test_name + ".tour"
+                        test_name + "_" + solution->solution_name() + "_" + std::to_string(solution->solution_version()) + ".tour"
                     )
                 );
                 std::ofstream out(path);
+                out << "NAME: " << result.tour.GetTestName() + "_"
+                    + result.solution_name + "_"
+                    + std::to_string(result.solution_version) << std::endl;
+                out << "TYPE: TOUR" << std::endl;
+                out << "DIMENSION: " << result.tour.path.size() << std::endl;
+
                 out << "WEIGHT: " << result.tour.TotalWeight() << std::endl;
                 if (optimizer) {
                     out << "OPTIMIZER: " << optimizer->optimizer_name() << std::endl;
                 }
+
+                out << "TOUR_SECTION" << std::endl;
+
+                for (auto v : result.tour.path) {
+                    out << v << std::endl;
+                }
+
+                out << -1 << std::endl;
             }
         }
 
