@@ -84,7 +84,13 @@ namespace NRunner {
             std::vector<TestResult> result;
             for (const auto& test : tests) {
                 result.push_back(run_on_single_test(test));
-                std::cout << "Ran successfully on test " << test_name << ' ' << " with score " << result.back().tour.TotalWeight() << std::endl;
+                if (test_name == "all") {
+                    std::cout << "Ran successfully on test " << test.GetTestName() << ' '
+                    << " with score " << result.back().tour.TotalWeight() << std::endl;
+                } else {
+                    std::cout << "Ran successfully on test " << test_name << ' ' << " with score "
+                              << result.back().tour.TotalWeight() << std::endl;
+                }
             }
             return result;
         }

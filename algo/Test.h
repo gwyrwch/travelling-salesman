@@ -6,7 +6,7 @@
 
 namespace NAlgo {
     struct Point {
-        int x, y;
+        double x, y;
     };
 
     class Test {
@@ -29,7 +29,7 @@ namespace NAlgo {
             return distance_function(*this, u, v);
         }
 
-        std::string GetTestName() {
+        std::string GetTestName() const {
             return name;
         }
 

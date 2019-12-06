@@ -20,7 +20,7 @@ namespace NUtil {
 
     std::string Trim(std::string s) {
         for (int i = 0; i < 2; i++) {
-            while (!s.empty() && isspace(s.back())) {
+            while (!s.empty() && (isspace(s.back()) || s.back() == '\t')) {
                 s.pop_back();
             }
             std::reverse(s.begin(), s.end());
