@@ -55,7 +55,7 @@ namespace NRunner {
             for (auto result : testResults) {
                 std::filesystem::path path(
                     NConfig::CacheConfig::CACHE_DIRECTORY / (
-                        test_name + "_" + solution->solution_name() + "_" + std::to_string(solution->solution_version()) + ".tour"
+                        result.tour.GetTestName() + "_" + solution->solution_name() + "_" + std::to_string(solution->solution_version()) + ".tour"
                     )
                 );
                 std::ofstream out(path);

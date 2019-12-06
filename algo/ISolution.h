@@ -29,6 +29,7 @@ namespace NAlgo {
         NearestNeighbour,
         NaiveSolution,
         MinimumSpanningTree,
+        BranchAndBound,
 
         INVALID_SOLUTION_NAME
     };
