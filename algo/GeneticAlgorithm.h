@@ -20,12 +20,13 @@ namespace NAlgo {
 
     enum class EParentSelectType : int {
         Inbreeding,
-        Outbreeding
+        Outbreeding,
+        Nothing
     };
 
     struct GAHyperOpt {
         int population_size = 100;
-        EParentSelectType parent_select_type = EParentSelectType::Outbreeding;
+        EParentSelectType parent_select_type = EParentSelectType::Nothing;
         ESelectType select_type = ESelectType::Tournament;
         double proportion_of_crossover = 0.3;
         double proportion_of_mutation = 0.04;
@@ -49,7 +50,7 @@ namespace NAlgo {
             Tour tour(test);
 
             N = hyper_opt.population_size;
-            current_population = initialize(test.GetVertexNum());
+            current_population = initialize(N, test.GetVertexNum());
 
             timer.Reset();
             while (timer.Passed() < deadline) {
@@ -57,7 +58,9 @@ namespace NAlgo {
 
                 while ((int)new_population.size() + 1 < (int)current_population.size()) {
                     auto p1 = select(hyper_opt.select_type, test, test.GetVertexNum());
-                    auto p2 = select(hyper_opt.select_type, test, test.GetVertexNum());
+                    auto p2 = hyper_opt.parent_select_type == EParentSelectType::Nothing
+                            ? select(hyper_opt.select_type, test, test.GetVertexNum())
+                            : choose_parent(hyper_opt.parent_select_type, p1);
 
                     bool do_crossover = get_random_double() <= hyper_opt.proportion_of_crossover;
                     bool do_mutate_1 = get_random_double() <= hyper_opt.proportion_of_mutation;
@@ -81,26 +84,22 @@ namespace NAlgo {
                     new_population.push_back(p2);
                 }
 
-                current_population = new_population;
+                current_population = std::vector<Path>(new_population.begin(), new_population.end());
                 N = current_population.size();
 
-                std::vector<int64_t> all_weights;
-                Tour candidate(test);
-                for (int i = 0; i < current_population.size(); i++) {
-                    candidate.path = current_population[i];
-                    candidate.CalcTotalWeight();
-                    all_weights.push_back(candidate.TotalWeight());
-                    if (candidate.TotalWeight() < tour.TotalWeight()) {
-                        tour = candidate;
-                    }
-                }
-                std::sort(all_weights.begin(), all_weights.end());
-                for (int i = 0; i < 1; i++) {
-                    std::cout << all_weights[i] << ' ';
-                }
-                std::cout << std::endl;
+//                std::sort(all_weights.begin(), all_weights.end());
             }
 
+            std::vector<int64_t> all_weights;
+            Tour candidate(test);
+            for (int i = 0; i < current_population.size(); i++) {
+                candidate.path = current_population[i];
+                candidate.CalcTotalWeight();
+                all_weights.push_back(candidate.TotalWeight());
+                if (candidate.TotalWeight() < tour.TotalWeight()) {
+                    tour = candidate;
+                }
+            }
             tour.CalcTotalWeight();
             assert(tour.TotalWeight() != LONG_LONG_MAX);
             return tour;
@@ -119,16 +118,16 @@ namespace NAlgo {
 
         std::mt19937 gen;
         Timer timer;
-        const double deadline = 5000;
+        const double deadline = 20000;
 
-        std::vector<Path> initialize(int vertex_num) {
+        std::vector<Path> initialize(int count, int vertex_num) {
             std::vector<Path> population;
-            population.resize(N);
+            population.resize(count);
 
             Path default_path(vertex_num);
             std::iota(default_path.begin(), default_path.end(), 0);
 
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < count; i++) {
                 population[i] = default_path;
                 std::shuffle(population[i].begin() + 1, population[i].end(), gen);
             }
@@ -167,14 +166,20 @@ namespace NAlgo {
                     total_weight_for_all += total_weights.back();
                 }
 
-                std::vector<double> probs;
+                auto mn_weight = *std::min_element(total_weights.begin(), total_weights.end());
+                auto mx_weight = *std::max_element(total_weights.begin(), total_weights.end());
+                std::vector<long double> probs;
                 for (int i = 0; i < N; i++) {
-                    probs.emplace_back(std::log(1. * total_weights[i] / total_weight_for_all));
+                    probs.emplace_back(std::log(1. * (total_weights[i] - mn_weight + 1) / (mx_weight - mn_weight + 1)));
                 }
 
-                auto log_sum = std::accumulate(probs.begin(), probs.end(), 0.0);
+                auto log_sum = std::accumulate(probs.begin(), probs.end(), (long double)0);
                 for (int i = 0; i < N; i++) {
-                    probs[i] = probs[i] / log_sum;
+                    if (mn_weight == mx_weight) {
+                        probs[i] = (long double)1 / N;
+                    } else {
+                        probs[i] = probs[i] / log_sum;
+                    }
                 }
 
                 if (select_type == ESelectType::Ranking) {
@@ -199,19 +204,19 @@ namespace NAlgo {
 
                 auto rnd = get_random_double();
                 double sum = 0;
-                int to_kill = -1;
+                int to_select = -1;
                 for (int i = 0; i < N; i++) {
                     double prob = probs[i];
                     sum += prob;
 
                     if (rnd < sum + 1e-9) {
-                        to_kill = i;
+                        to_select = i;
                         break;
                     }
                 }
 
-                assert(to_kill != -1);
-                return current_population[to_kill];
+                assert(to_select != -1);
+                return current_population[to_select];
             } else if (select_type == ESelectType::UniformRanking) {
 
             } else if (select_type == ESelectType::SigmaClipping) {
@@ -221,38 +226,31 @@ namespace NAlgo {
             return {};
         }
 
-//        std::pair<std::vector<int>, std::vector<int>> choose_parents(EParentSelectType select_type, int count_children) {
-//            if (select_type == EParentSelectType::Inbreeding || select_type == EParentSelectType::Outbreeding) {
-//                std::vector<int> parents1, parents2;
-//                for (int iter = 0; iter < count_children; iter++) {
-//                    int par1 = gen() % N;
-//                    int par2 = 0;
-//                    int best_count = select_type == EParentSelectType::Inbreeding ? -1 : INT_MAX;
-//
-//                    for (int i = 0; i < N; i++) {
-//                        if (i != par1) {
-//                            int count = 0;
-//                            for (int j = 0; j < N; j++) {
-//                                count += current_population[par1][j] == current_population[i][j];
-//                            }
-//                            if (
-//                                (select_type == EParentSelectType::Inbreeding && count > best_count) ||
-//                                (select_type == EParentSelectType::Outbreeding && count < best_count)
-//                            ){
-//                                best_count = count;
-//                                par2 = i;
-//                            }
-//                        }
-//                    }
-//
-//                    parents1.push_back(par1);
-//                    parents2.push_back(par2);
-//                }
-//                return {parents1, parents2};
-//            }
-//
-//            return {};
-//        }
+        Path choose_parent(EParentSelectType select_type, const Path& p1) {
+            if (select_type == EParentSelectType::Inbreeding || select_type == EParentSelectType::Outbreeding) {
+                int par2 = 0;
+                int best_count = select_type == EParentSelectType::Inbreeding ? -1 : INT_MAX;
+
+                for (int i = 0; i < N; i++) {
+                    if (current_population[i] != p1) {
+                        int count = 0;
+                        for (int j = 0; j < N; j++) {
+                            count += p1[j] == current_population[i][j];
+                        }
+                        if (
+                            (select_type == EParentSelectType::Inbreeding && count > best_count) ||
+                            (select_type == EParentSelectType::Outbreeding && count < best_count)
+                        ){
+                            best_count = count;
+                            par2 = i;
+                        }
+                    }
+                }
+                return current_population[par2];
+            }
+
+            return {};
+        }
 
         Path cross(const Path& first_parent, const Path& second_parent) {
             std::vector<char> used(first_parent.size(), 0);
