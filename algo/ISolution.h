@@ -30,6 +30,7 @@ namespace NAlgo {
         NaiveSolution,
         MinimumSpanningTree,
         BranchAndBound,
+        GeneticAlgorithm,
 
         INVALID_SOLUTION_NAME
     };

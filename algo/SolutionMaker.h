@@ -5,9 +5,11 @@
 #include <algo/MinimumSpanningTree.h>
 #include <algo/LocalSearch.h>
 #include <algo/BranchAndBound.h>
+#include <algo/GeneticAlgorithm.h>
 
 #include <config/CacheConfig.h>
 #include <fstream>
+
 
 
 namespace NAlgo {
@@ -20,6 +22,8 @@ namespace NAlgo {
             return ESolution::MinimumSpanningTree;
         } else if (solution_name == "BranchAndBound") {
             return ESolution::BranchAndBound;
+        } else if(solution_name == "GeneticAlgorithm") {
+            return ESolution::GeneticAlgorithm;
         }
         return ESolution::INVALID_SOLUTION_NAME;
     }
@@ -63,6 +67,8 @@ namespace NAlgo {
                 return std::make_unique<MinimumSpanningTree>(version);
             case ESolution::BranchAndBound:
                 return std::make_unique<BranchAndBound>(version);
+            case ESolution::GeneticAlgorithm:
+                return std::make_unique<GeneticAlgorithm>(version);
             case ESolution::INVALID_SOLUTION_NAME:
                 throw std::runtime_error("Invalid solution name");
             default:
