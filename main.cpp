@@ -27,7 +27,11 @@ int main(int argc, char** argv) {
                 ::cxxopts::value<std::string>()->default_value("all")
             )
             ("optimizer-name", "-- choose optimizer algorithm", ::cxxopts::value<std::string>()->default_value(""))
-            ("optimizer-deadline", "-- deadline for optimizer in milliseconds", ::cxxopts::value<double>()->default_value("2000"));
+            (
+                    "optimizer-deadline",
+                    "-- deadline for optimizer in milliseconds",
+                    ::cxxopts::value<double>()->default_value("2000"))
+            ("comment", "-- write a comment to your solution", ::cxxopts::value<std::string>()->default_value(""));
 
         auto run_solution_options = solution_opt_parser.parse(argc, argv);
 
@@ -40,10 +44,14 @@ int main(int argc, char** argv) {
             optimizer_name = run_solution_options["optimizer-name"].as<std::string>();
             optimizer_config = NAlgo::OptimizerConfig();
             optimizer_config->deadline = run_solution_options["optimizer-deadline"].as<double>();
-            std::cout << optimizer_config->deadline << std::endl;
         }
 
-        NRunner::SolutionsRunner solutionsRunner(solution_name, test_name, optimizer_name, optimizer_config);
+        std::optional<std::string> comment;
+        if (run_solution_options.count("comment")) {
+            comment = run_solution_options["comment"].as<std::string>();
+        }
+
+        NRunner::SolutionsRunner solutionsRunner(solution_name, test_name, optimizer_name, optimizer_config, comment);
         if (optimizer_name.has_value()) {
             solutionsRunner.run_optimize_and_save();
         } else {

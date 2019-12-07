@@ -118,7 +118,7 @@ namespace NAlgo {
 
         std::mt19937 gen;
         Timer timer;
-        const double deadline = 20000;
+        const double deadline = 70000;
 
         std::vector<Path> initialize(int count, int vertex_num) {
             std::vector<Path> population;

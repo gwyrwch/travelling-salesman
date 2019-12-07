@@ -24,11 +24,13 @@ namespace NRunner {
     public:
         SolutionsRunner(
             const std::string& solution_name,
-            std::string test_name,
+            std::string _test_name,
             std::optional<std::string> optimizer_name,
-            std::optional<NAlgo::OptimizerConfig> optimizer_config
+            std::optional<NAlgo::OptimizerConfig> optimizer_config,
+            std::optional<std::string> comment
         )
-            : test_name(test_name)
+            : test_name(std::move(_test_name))
+            , comment(std::move(comment))
         {
             if (test_name == "all") {
                 tests = NAlgo::LoadAllTests(NConfig::DatasetConfig::DATASET_LOCATION);
@@ -68,6 +70,10 @@ namespace NRunner {
                 out << "WEIGHT: " << result.tour.TotalWeight() << std::endl;
                 if (optimizer) {
                     out << "OPTIMIZER: " << optimizer->optimizer_name() << std::endl;
+                }
+
+                if (comment.has_value()) {
+                    out << "COMMENT: " << comment.value() << std::endl;
                 }
 
                 out << "TOUR_SECTION" << std::endl;
@@ -127,5 +133,6 @@ namespace NRunner {
         std::unique_ptr<NAlgo::IOptimizer> optimizer;
         std::string test_name;
         std::vector<NAlgo::Test> tests;
+        std::optional<std::string> comment;
     };
 }
