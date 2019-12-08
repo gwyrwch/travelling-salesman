@@ -13,8 +13,8 @@
 namespace NAlgo {
     class BranchAndBound : public ISolution {
     public:
-        explicit BranchAndBound(int version)
-            : ISolution(version)
+        explicit BranchAndBound(int version, SolutionConfig config)
+            : ISolution(version, std::move(config))
         {}
 
         Tour solve(const Test& test) override {
@@ -82,7 +82,7 @@ namespace NAlgo {
         }
 
         void dfs(const Test& test, int test_size) {
-            if (iter % 100000 == 0 && timer.Passed() > deadline) {
+            if (iter % 100000 == 0 && timer.Passed() > config.deadline) {
                 kill_dfs = true;
                 return;
             }
@@ -131,7 +131,5 @@ namespace NAlgo {
         int64_t current_weight;
         std::vector<std::vector<std::pair<int64_t, int>>> order;
         int64_t iter = 0;
-
-        const double deadline = 10000; // todo param
     };
 }

@@ -5,8 +5,8 @@
 namespace NAlgo {
     class NearestNeighbour : public ISolution {
     public:
-        explicit NearestNeighbour(int version)
-            : ISolution(version)
+        explicit NearestNeighbour(int version, SolutionConfig config)
+            : ISolution(version, std::move(config))
         {}
 
         Tour solve(const Test& test) override {

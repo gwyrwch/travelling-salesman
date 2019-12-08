@@ -2,6 +2,7 @@
 
 #include <algo/ISolution.h>
 #include <lib/Timer.h>
+#include <lib/ThreadPool.h>
 
 #include <vector>
 #include <numeric>
@@ -40,8 +41,8 @@ namespace NAlgo {
     public:
         using Path = std::vector<int>;
 
-        explicit GeneticAlgorithm(int version, const GAHyperOpt& hyper_opt = {})
-            : ISolution(version)
+        explicit GeneticAlgorithm(int version, SolutionConfig config, const GAHyperOpt& hyper_opt = {})
+            : ISolution(version, std::move(config))
             , gen(0)
             , hyper_opt(hyper_opt)
         {}
@@ -49,11 +50,10 @@ namespace NAlgo {
         Tour solve(const Test& test) override {
             Tour tour(test);
 
-            N = hyper_opt.population_size;
-            current_population = initialize(N, test.GetVertexNum());
+            current_population = initialize(hyper_opt.population_size, test.GetVertexNum());
 
             timer.Reset();
-            while (timer.Passed() < deadline) {
+            while (timer.Passed() < config.deadline) {
                 std::vector<Path> new_population;
 
                 while ((int)new_population.size() + 1 < (int)current_population.size()) {
@@ -85,7 +85,7 @@ namespace NAlgo {
                 }
 
                 current_population = std::vector<Path>(new_population.begin(), new_population.end());
-                N = current_population.size();
+
 
 //                std::sort(all_weights.begin(), all_weights.end());
             }
@@ -112,13 +112,11 @@ namespace NAlgo {
 
     private:
         std::vector<Path> current_population;
-        int N;
 
         GAHyperOpt hyper_opt;
 
         std::mt19937 gen;
         Timer timer;
-        const double deadline = 1000;
 
         std::vector<Path> initialize(int count, int vertex_num) {
             std::vector<Path> population;
@@ -136,8 +134,8 @@ namespace NAlgo {
 
         Path select(ESelectType select_type, const Test& test, int vertex_num) {
             if (select_type == ESelectType::Tournament) {
-                int i = gen() % N;
-                int j = gen() % N;
+                int i = gen() % (int)current_population.size();
+                int j = gen() % (int)current_population.size();
 
                 Tour tour_i(test), tour_j(test);
 
@@ -169,14 +167,14 @@ namespace NAlgo {
                 auto mn_weight = *std::min_element(total_weights.begin(), total_weights.end());
                 auto mx_weight = *std::max_element(total_weights.begin(), total_weights.end());
                 std::vector<long double> probs;
-                for (int i = 0; i < N; i++) {
+                for (size_t i = 0; i < current_population.size(); i++) {
                     probs.emplace_back(std::log(1. * (total_weights[i] - mn_weight + 1) / (mx_weight - mn_weight + 1)));
                 }
 
                 auto log_sum = std::accumulate(probs.begin(), probs.end(), (long double)0);
-                for (int i = 0; i < N; i++) {
+                for (size_t i = 0; i < current_population.size(); i++) {
                     if (mn_weight == mx_weight) {
-                        probs[i] = (long double)1 / N;
+                        probs[i] = (long double)1 / current_population.size();
                     } else {
                         probs[i] = probs[i] / log_sum;
                     }
@@ -184,28 +182,28 @@ namespace NAlgo {
 
                 if (select_type == ESelectType::Ranking) {
                     std::vector<int> index;
-                    index.resize(N);
+                    index.resize(current_population.size());
                     std::iota(index.begin(), index.end(), 0);
 
                     std::sort(index.begin(), index.end(), [&probs](int i, int j) {
                         return probs[i] < probs[j];
                     });
 
-                    std::vector<int> order(N);
-                    for (int i = 0; i < N; i++) {
+                    std::vector<int> order(current_population.size());
+                    for (size_t i = 0; i < current_population.size(); i++) {
                         order[index[i]] = i;
                     }
 
-                    for (int i = 0; i < N; i++) {
-                        probs[i] = 1. / N * (hyper_opt.ranking_opt.a -
-                                (hyper_opt.ranking_opt.a - hyper_opt.ranking_opt.b) * order[i] / (N - 1));
+                    for (size_t i = 0; i < current_population.size(); i++) {
+                        probs[i] = 1. / current_population.size() * (hyper_opt.ranking_opt.a -
+                                (hyper_opt.ranking_opt.a - hyper_opt.ranking_opt.b) * order[i] / (1. * current_population.size() - 1));
                     }
                 }
 
                 auto rnd = get_random_double();
                 double sum = 0;
                 int to_select = -1;
-                for (int i = 0; i < N; i++) {
+                for (size_t i = 0; i < current_population.size(); i++) {
                     double prob = probs[i];
                     sum += prob;
 
@@ -231,10 +229,10 @@ namespace NAlgo {
                 int par2 = 0;
                 int best_count = select_type == EParentSelectType::Inbreeding ? -1 : INT_MAX;
 
-                for (int i = 0; i < N; i++) {
+                for (size_t i = 0; i < current_population.size(); i++) {
                     if (current_population[i] != p1) {
                         int count = 0;
-                        for (int j = 0; j < N; j++) {
+                        for (size_t j = 0; j < current_population.size(); j++) {
                             count += p1[j] == current_population[i][j];
                         }
                         if (
@@ -268,14 +266,14 @@ namespace NAlgo {
             Path child(first_parent.size(), -1);
             int tf1 = 0, tf2 = 0, tf3 = 0;
 
-            for (int i = 0; i < first_parent.size(); i++) {
+            for (size_t i = 0; i < first_parent.size(); i++) {
                 if (bitmask[i]) {
                     used[first_parent[i]] = 1;
                     child[i] = first_parent[i];
                 }
             }
 
-            for (int i = 0; i < second_parent.size(); i++) {
+            for (size_t i = 0; i < second_parent.size(); i++) {
                 if (child[i] == -1 && !used[second_parent[i]]) {
                     used[second_parent[i]] = 1;
                     child[i] = second_parent[i];
@@ -283,13 +281,13 @@ namespace NAlgo {
             }
 
             Path rest;
-            for (int i = 0; i < first_parent.size(); i++) {
+            for (size_t i = 0; i < first_parent.size(); i++) {
                 if (!used[first_parent[i]]) {
                     rest.push_back(first_parent[i]);
                 }
             }
 
-            for (int i = 0, j = 0; i < first_parent.size(); i++) {
+            for (size_t i = 0, j = 0; i < first_parent.size(); i++) {
                 if (child[i] == -1) {
                     child[i] = rest[j++];
                 }

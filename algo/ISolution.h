@@ -4,10 +4,16 @@
 #include <string>
 
 namespace NAlgo {
+    struct SolutionConfig {
+        double deadline;
+        bool is_multithreaded;
+    };
+
     class ISolution {
     public:
-        explicit ISolution(int version)
+        explicit ISolution(int version, SolutionConfig config)
             : version(version)
+            , config(std::move(config))
         {}
         virtual ~ISolution() = default;
 
@@ -23,6 +29,7 @@ namespace NAlgo {
         }
     protected:
         int version;
+        SolutionConfig config;
     };
 
     enum class ESolution : int {

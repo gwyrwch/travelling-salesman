@@ -8,8 +8,8 @@
 namespace NAlgo {
     class NaiveSolution : public ISolution {
     public:
-        explicit NaiveSolution(int version)
-                : ISolution(version)
+        explicit NaiveSolution(int version, SolutionConfig config)
+                : ISolution(version, std::move(config))
         {}
 
         Tour solve(const Test& test) override {
@@ -32,7 +32,7 @@ namespace NAlgo {
                     tour = candidate;
                     answer = candidate.TotalWeight();
                 }
-            } while(std::next_permutation(v.begin(), v.end()) && timer.Passed() < deadline);
+            } while(std::next_permutation(v.begin(), v.end()) && timer.Passed() < config.deadline);
 
             return tour;
         }
@@ -41,7 +41,6 @@ namespace NAlgo {
             return "NaiveSolution";
         }
     private:
-        double deadline = 1000;
         Timer timer;
     };
 }

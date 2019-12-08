@@ -8,8 +8,8 @@
 namespace NAlgo {
     class MinimumSpanningTree : public ISolution {
     public:
-        explicit MinimumSpanningTree(int version)
-                : ISolution(version)
+        explicit MinimumSpanningTree(int version, SolutionConfig config)
+                : ISolution(version, std::move(config))
         {}
 
         Tour solve(const Test& test) override {

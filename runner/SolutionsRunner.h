@@ -27,7 +27,8 @@ namespace NRunner {
             std::string _test_name,
             std::optional<std::string> optimizer_name,
             std::optional<NAlgo::OptimizerConfig> optimizer_config,
-            std::optional<std::string> comment
+            std::optional<std::string> comment,
+            NAlgo::SolutionConfig solution_config
         )
             : test_name(std::move(_test_name))
             , comment(std::move(comment))
@@ -38,7 +39,7 @@ namespace NRunner {
                 tests = {NAlgo::LoadSingleTest(NConfig::DatasetConfig::DATASET_LOCATION, test_name)};
             }
 
-            solution = NAlgo::MakeSolution(solution_name);
+            solution = NAlgo::MakeSolution(solution_name, solution_config);
             if (optimizer_name.has_value()) {
                 // todo ensure config has value
                 optimizer = NAlgo::MakeOptimizer(optimizer_name.value(), optimizer_config.value());

@@ -57,21 +57,21 @@ namespace NAlgo {
         return version;
     }
 
-    std::unique_ptr<ISolution> MakeSolution(const std::string& solution_name) {
+    std::unique_ptr<ISolution> MakeSolution(const std::string& solution_name, SolutionConfig config) {
         ESolution solution_code = ParseSolutionName(solution_name);
         int version = GetSolutionVersion(solution_name);
 
         switch (solution_code) {
             case ESolution::NearestNeighbour:
-                return std::make_unique<NearestNeighbour>(version);
+                return std::make_unique<NearestNeighbour>(version, std::move(config));
             case ESolution::NaiveSolution:
-                return std::make_unique<NaiveSolution>(version);
+                return std::make_unique<NaiveSolution>(version, std::move(config));
             case ESolution::MinimumSpanningTree:
-                return std::make_unique<MinimumSpanningTree>(version);
+                return std::make_unique<MinimumSpanningTree>(version, std::move(config));
             case ESolution::BranchAndBound:
-                return std::make_unique<BranchAndBound>(version);
+                return std::make_unique<BranchAndBound>(version, std::move(config));
             case ESolution::GeneticAlgorithm:
-                return std::make_unique<GeneticAlgorithm>(version);
+                return std::make_unique<GeneticAlgorithm>(version, std::move(config));
             case ESolution::INVALID_SOLUTION_NAME:
                 throw std::runtime_error("Invalid solution name");
             default:
