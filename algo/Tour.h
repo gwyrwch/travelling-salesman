@@ -18,10 +18,11 @@ namespace NAlgo {
         void CalcTotalWeight()  {
             if (path.empty()) {
                 total_weight = LONG_LONG_MAX;
-            }
-            total_weight = 0;
-            for (size_t i = 0; i < path.size(); i++) {
-                total_weight += test.EvalDistance(path[i], path[(i + 1) % path.size()]);
+            } else {
+                total_weight = 0;
+                for (size_t i = 0; i < path.size(); i++) {
+                    total_weight += test.EvalDistance(path[i], path[(i + 1) % path.size()]);
+                }
             }
         }
 

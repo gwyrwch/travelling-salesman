@@ -6,10 +6,11 @@
 #include <algo/LocalSearch.h>
 #include <algo/BranchAndBound.h>
 #include <algo/GeneticAlgorithm.h>
+#include <algo/SimulatedAnnealing.h>
+
 
 #include <config/CacheConfig.h>
 #include <fstream>
-
 
 
 namespace NAlgo {
@@ -31,6 +32,8 @@ namespace NAlgo {
     EOptimizer ParseOptimizerName(const std::string& optimizer_name) {
         if (optimizer_name == "LocalSearch") {
             return EOptimizer::LocalSearch;
+        } else if (optimizer_name == "SimulatedAnnealing") {
+            return EOptimizer::SimulatedAnnealing;
         }
         throw;
     }
@@ -83,6 +86,8 @@ namespace NAlgo {
         switch (optimizer_code) {
             case EOptimizer::LocalSearch:
                 return std::make_unique<LocalSearch>(version, std::move(config));
+            case EOptimizer::SimulatedAnnealing:
+                return std::make_unique<SimulatedAnnealing>(version, std::move(config));
             default:
                 return nullptr;
         }

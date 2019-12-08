@@ -3,9 +3,14 @@
 #include <cmath>
 
 namespace NAlgo {
-    int64_t sqr(int64_t d) {
+//    int64_t sqr(int64_t d) {
+//        return d * d;
+//    }
+
+    long double sqr(long double d) {
         return d  *  d;
     }
+
 
     double PI = 3.141592;
     double get_latitude(Point p) {
@@ -25,7 +30,7 @@ namespace NAlgo {
             return [](const Test& test, int u, int v) {
                 auto pt1 = test.GetPoint(u);
                 auto pt2 = test.GetPoint(v);
-                return int(std::sqrt(sqr(pt1.x - pt2.x) + sqr(pt1.y - pt2.y)) + 0.5);
+                return lround(std::sqrt(sqr(pt1.x - pt2.x) + sqr(pt1.y - pt2.y)));
             };
         } else if (name == "GEO") {
             return [](const Test& test, int u, int v) {

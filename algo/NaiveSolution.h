@@ -2,6 +2,7 @@
 
 #include <algo/ISolution.h>
 #include <algorithm>
+#include <lib/Timer.h>
 
 
 namespace NAlgo {
@@ -21,7 +22,7 @@ namespace NAlgo {
                 v.push_back(i);
             }
 
-
+            timer.Reset();
             do {
                 Tour candidate(test);
                 candidate.path = v;
@@ -31,7 +32,7 @@ namespace NAlgo {
                     tour = candidate;
                     answer = candidate.TotalWeight();
                 }
-            } while(std::next_permutation(v.begin(), v.end()));
+            } while(std::next_permutation(v.begin(), v.end()) && timer.Passed() < deadline);
 
             return tour;
         }
@@ -39,6 +40,9 @@ namespace NAlgo {
         std::string solution_name() const override  {
             return "NaiveSolution";
         }
+    private:
+        double deadline = 1000;
+        Timer timer;
     };
 }
 

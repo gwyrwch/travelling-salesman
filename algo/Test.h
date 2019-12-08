@@ -6,7 +6,7 @@
 
 namespace NAlgo {
     struct Point {
-        double x, y;
+        long double x, y;
     };
 
     class Test {

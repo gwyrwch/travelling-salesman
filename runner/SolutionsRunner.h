@@ -66,7 +66,8 @@ namespace NRunner {
                     + std::to_string(result.solution_version) << std::endl;
                 out << "TYPE: TOUR" << std::endl;
                 out << "DIMENSION: " << result.tour.path.size() << std::endl;
-
+                result.tour.CalcTotalWeight();
+                std::cout << result.tour.TotalWeight() << std::endl;
                 out << "WEIGHT: " << result.tour.TotalWeight() << std::endl;
                 if (optimizer) {
                     out << "OPTIMIZER: " << optimizer->optimizer_name() << std::endl;

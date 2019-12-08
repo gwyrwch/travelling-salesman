@@ -31,7 +31,8 @@ namespace NAlgo {
     };
 
     enum class EOptimizer : int {
-        LocalSearch
+        LocalSearch,
+        SimulatedAnnealing
     };
 }
 
