@@ -4,15 +4,15 @@
 #include <lib/Timer.h>
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <random>
 
 namespace NAlgo {
     class SimulatedAnnealing : public IOptimizer {
     public:
         explicit SimulatedAnnealing(int version, OptimizerConfig config)
-                : IOptimizer(version, std::move(config))
-                , gen(0)
+            : IOptimizer(version, std::move(config))
+            , gen(0)
         {}
 
         Tour optimize(const Test& test, Tour baseline) override {

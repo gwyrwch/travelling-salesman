@@ -47,52 +47,76 @@ namespace NAlgo {
             , hyper_opt(hyper_opt)
         {}
 
+        std::pair<Path, Path> genetic_epoch(const Test& test) {
+            auto p1 = select(hyper_opt.select_type, test, test.GetVertexNum());
+            auto p2 = hyper_opt.parent_select_type == EParentSelectType::Nothing
+                      ? select(hyper_opt.select_type, test, test.GetVertexNum())
+                      : choose_parent(hyper_opt.parent_select_type, p1);
+
+            bool do_crossover = get_random_double() <= hyper_opt.proportion_of_crossover;
+            bool do_mutate_1 = get_random_double() <= hyper_opt.proportion_of_mutation;
+            bool do_mutate_2 = get_random_double() <= hyper_opt.proportion_of_mutation;
+
+            if (do_crossover) {
+                auto c1 = cross(p1, p2);
+                auto c2 = cross(p2, p1);
+                p1 = c1;
+                p2 = c2;
+            }
+
+            if (do_mutate_1) {
+                mutate(p1, test.GetVertexNum());
+            }
+            if (do_mutate_2) {
+                mutate(p2, test.GetVertexNum());
+            }
+
+            return {p1, p2};
+        }
+
         Tour solve(const Test& test) override {
             Tour tour(test);
 
             current_population = initialize(hyper_opt.population_size, test.GetVertexNum());
 
+            ThreadPool pool(4);
             timer.Reset();
+
             while (timer.Passed() < config.deadline) {
                 std::vector<Path> new_population;
 
-                while ((int)new_population.size() + 1 < (int)current_population.size()) {
-                    auto p1 = select(hyper_opt.select_type, test, test.GetVertexNum());
-                    auto p2 = hyper_opt.parent_select_type == EParentSelectType::Nothing
-                            ? select(hyper_opt.select_type, test, test.GetVertexNum())
-                            : choose_parent(hyper_opt.parent_select_type, p1);
+                if (config.is_multithreaded) {
+                    size_t pool_size = current_population.size() / 2;
+                    std::vector<std::future<std::pair<Path, Path>>> results;
 
-                    bool do_crossover = get_random_double() <= hyper_opt.proportion_of_crossover;
-                    bool do_mutate_1 = get_random_double() <= hyper_opt.proportion_of_mutation;
-                    bool do_mutate_2 = get_random_double() <= hyper_opt.proportion_of_mutation;
-
-                    if (do_crossover) {
-                        auto c1 = cross(p1, p2);
-                        auto c2 = cross(p2, p1);
-                        p1 = c1;
-                        p2 = c2;
+                    for(size_t i = 0; i < pool_size; i++) {
+                        results.emplace_back(
+                            pool.enqueue([this, &test](){
+                                auto [p1, p2] = genetic_epoch(test);
+                                return std::make_pair(p1, p2);
+                            })
+                        );
                     }
 
-                    if (do_mutate_1) {
-                        mutate(p1, test.GetVertexNum());
+                    for(auto && result: results) {
+                        auto [p1, p2] = result.get();
+                        new_population.push_back(p1);
+                        new_population.push_back(p2);
                     }
-                    if (do_mutate_2) {
-                        mutate(p2, test.GetVertexNum());
-                    }
+                } else {
+                    while ((int) new_population.size() + 1 < (int) current_population.size()) {
+                        auto [p1, p2] = genetic_epoch(test);
 
-                    new_population.push_back(p1);
-                    new_population.push_back(p2);
+                        new_population.push_back(std::move(p1));
+                        new_population.push_back(std::move(p2));
+                    }
                 }
-
                 current_population = std::vector<Path>(new_population.begin(), new_population.end());
-
-
-//                std::sort(all_weights.begin(), all_weights.end());
             }
 
             std::vector<int64_t> all_weights;
             Tour candidate(test);
-            for (int i = 0; i < current_population.size(); i++) {
+            for (size_t i = 0; i < current_population.size(); i++) {
                 candidate.path = current_population[i];
                 candidate.CalcTotalWeight();
                 all_weights.push_back(candidate.TotalWeight());
