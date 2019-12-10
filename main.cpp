@@ -31,6 +31,11 @@ int main(int argc, char** argv) {
                 "-- if specified, then multi-threaded mode for solution if available"
             )
             (
+                "thread-count",
+                "-- amount of threads in multithreading mode",
+                ::cxxopts::value<int>()->default_value("4")
+            )
+            (
                 "test-name",
                 "-- choose test to run, default: all",
                 ::cxxopts::value<std::string>()->default_value("all")
@@ -48,6 +53,7 @@ int main(int argc, char** argv) {
         auto solution_name = run_solution_options["solution-name"].as<std::string>();
         auto solution_deadline = run_solution_options["solution-deadline"].as<double>();
         auto is_multithreaded = run_solution_options["multi"].count() != 0;
+        auto thread_count = run_solution_options["thread-count"].as<int>();
         auto test_name = run_solution_options["test-name"].as<std::string>();
 
         std::optional<std::string> optimizer_name;
@@ -72,7 +78,8 @@ int main(int argc, char** argv) {
             comment,
             {
                 .deadline = solution_deadline,
-                .is_multithreaded = is_multithreaded
+                .is_multithreaded = is_multithreaded,
+                .thread_count = thread_count
             }
         );
         if (optimizer_name.has_value()) {

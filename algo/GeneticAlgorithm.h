@@ -79,7 +79,7 @@ namespace NAlgo {
 
             current_population = initialize(hyper_opt.population_size, test.GetVertexNum());
 
-            ThreadPool pool(4);
+            ThreadPool pool(config.thread_count);
             timer.Reset();
 
             while (timer.Passed() < config.deadline) {

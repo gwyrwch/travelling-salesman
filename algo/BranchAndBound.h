@@ -63,13 +63,6 @@ namespace NAlgo {
                 if (used[v] == 0) {
                     int64_t best_weight = LONG_LONG_MAX;
 
-//                    for (auto& [w, u] : order[v]) {
-//                        if (u != v && !used[u]) {
-//                            best_weight = w;
-//                            break;
-//                        }
-//                    }
-
                     if (best_weight == LONG_LONG_MAX) {
                         best_weight = order[v][0].first;
                     }

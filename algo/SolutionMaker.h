@@ -8,7 +8,6 @@
 #include <algo/GeneticAlgorithm.h>
 #include <algo/SimulatedAnnealing.h>
 
-
 #include <config/CacheConfig.h>
 #include <fstream>
 
@@ -40,7 +39,7 @@ namespace NAlgo {
 
     int GetSolutionVersion(const std::string& solution_name) {
         /*
-         * format: <solution_name>_<version>_<testname>.tour
+         * format: <testname>_<solution_name>_<version>.tour
          * <solution_name>.info contains version of the solution
          */
         std::filesystem::path version_path = NConfig::CacheConfig::CACHE_DIRECTORY / (solution_name + ".info");

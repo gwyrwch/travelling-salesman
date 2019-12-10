@@ -3,14 +3,9 @@
 #include <cmath>
 
 namespace NAlgo {
-//    int64_t sqr(int64_t d) {
-//        return d * d;
-//    }
-
     long double sqr(long double d) {
         return d  *  d;
     }
-
 
     double PI = 3.141592;
     double get_latitude(Point p) {

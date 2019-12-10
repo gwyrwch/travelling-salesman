@@ -11,6 +11,7 @@ namespace NAlgo {
     Test::Test(const std::filesystem::path &dataset_location, const std::string &test_name) {
         auto full_path = dataset_location / (test_name + ".tsp");
 
+        name = test_name;
         std::ifstream test_in(full_path);
         if (test_in) {
             ParseTestFromFile(test_in);
@@ -33,7 +34,6 @@ namespace NAlgo {
             // TODO: ENSURE(tokens.size() >= 2);
 
             if (tokens[0] == "NAME") {
-                name = tokens[1];
                 // TODO ENSURE name == test_name
             } else if (tokens[0] == "COMMENT") {
                 comment = tokens[1];
