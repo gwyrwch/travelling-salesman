@@ -40,7 +40,11 @@ int main(int argc, char** argv) {
                 "-- choose test to run, default: all",
                 ::cxxopts::value<std::string>()->default_value("all")
             )
-            ("optimizer-name", "-- choose optimizer algorithm", ::cxxopts::value<std::string>()->default_value(""))
+            (
+                    "optimizer-name",
+                    "-- choose optimizer algorithm",
+                    ::cxxopts::value<std::string>()->default_value("")
+            )
             (
                     "optimizer-deadline",
                     "-- deadline for optimizer in milliseconds",

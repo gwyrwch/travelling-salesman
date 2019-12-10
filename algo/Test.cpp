@@ -2,6 +2,7 @@
 
 #include <algo/Distance.h>
 #include <util/String.h>
+#include <util/Ensure.h>
 
 #include <iostream>
 #include <fstream>
@@ -31,16 +32,22 @@ namespace NAlgo {
 
             auto tokens = NUtil::SplitAndTrim(line, ':');
 
-            // TODO: ENSURE(tokens.size() >= 2);
+            NUtil::Ensure(tokens.size() >= 2, "Tokens size is less then 2");
 
             if (tokens[0] == "NAME") {
-                // TODO ENSURE name == test_name
+                NUtil::Ensure(
+                    tokens[1] == name || tokens[1] == name + ".tsp",
+                    "test_name in file doesn't match file name"
+                );
             } else if (tokens[0] == "COMMENT") {
                 comment = tokens[1];
             } else if (tokens[0] == "DIMENSION") {
                 vertex_num = atoi(tokens[1].c_str());
             } else if (tokens[0] == "TYPE") {
-                // TODO: ENSURE tokens[1]  == "TSP"
+                NUtil::Ensure(
+                        tokens[1] == "TSP",
+                        "invalid test: not for this type of task"
+                );
             } else if (tokens[0] == "EDGE_WEIGHT_TYPE") {
                 distance_function = MakeDistanceFunction(tokens[1]);
                 weight_type = tokens[1];
@@ -105,7 +112,12 @@ namespace NAlgo {
 
         }
 
-        // TODO: ENSURE getline ==  EOF
+        test_in >> line;
+        line = NUtil::Trim(line);
+        NUtil::Ensure(
+                line == "EOF",
+                "test doesn't contain EOF in the end"
+        );
     }
 
     Test LoadSingleTest(const std::filesystem::path &dataset_location, const std::string &test_name) {
