@@ -91,8 +91,28 @@ int main(int argc, char** argv) {
         } else {
             solutionsRunner.run_and_save();
         }
-    } else {
+    } else if (mode == "list-solutions"){
+        std::vector<std::string> all_solutions = {
+                "NaiveSolution",
+                "NearestNeighbour",
+                "BranchAndBound",
+                "MinimumSpanningTree",
+                "GeneticAlgorithm"
+        };
 
+        std::cout << "Available solutions: " << std::endl;
+        for (auto s : all_solutions)
+            std::cout << s << std::endl;
+
+    } else if (mode == "list-optimizers"){
+        std::vector<std::string> all_optimizers = {
+                "LocalSearch",
+                "SimulatedAnnealing"
+        };
+
+        std::cout << "Available optimizers: " << std::endl;
+        for (auto opt : all_optimizers)
+            std::cout << opt << std::endl;
     }
     return 0;
 }
