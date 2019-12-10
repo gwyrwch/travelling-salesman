@@ -66,9 +66,7 @@ NODE_COORD_SECTION/EDGE_WEIGHT_SECTION
 
 | Параметр         | Возможные значения | Описание  |
 | :---------------:  |:-------------------|:-----|
-
 | `--mode`         | `run-solution`     | режимы фреймворка |
->>>>>>> cea2cc58e5ab08b7dd44babb1e5023dae9d9b5df
 | `--solution-name`| `NaiveSolution`, `NearestNeighbour`, `MinimumSpanningTree`, `BranchAndBound`, `GeneticAlgorithm`|   название решения |  
 |`--solution-deadline`| `1000`| дедлайн для решения в миллисекундах, `default = 3000`. для решений с отсечением по времени| 
 |`--multi`| | если указан, то решение будет работать в многопоточном режиме| 
@@ -99,27 +97,13 @@ TOUR_SECTION
 ## __Сравнение решений__
 В проекте содержится файл `research.ipynb` в котором можно построить оптимальный ответ и найденный с использованием фреймворка на одном графике. Ниже расположены некоторые оптимальные маршруты и решения.
 
-<!--
-![alt text](img/branchandbound_st70.png)
-![alt text](img/ga_pr2392.png)
-![alt text](img/mst_eil76.png)
-![alt text](img/naivesolution_ch130.png)
--->
-<!--![alt text]()-->
-<<<<<<< HEAD
+
+
 <img src="img/branchandbound_st70.png" width="500" height="330" />
 <img src="img/ga_pr2392.png" width="500" height="330" />
 <img src="img/mst_eil76.png" width="500" height="330" />
 <img src="img/naivesolution_ch130.png" width="500" height="330" />
 <img src="img/nearestneighbour_a280.png" width="500" height="330" />
-=======
-<img src="img/branchandbound_st70.png" width="300" height="200" />
-<img src="img/ga_pr2392.png" width="300" height="200" />
-<img src="img/mst_eil76.png" width="300" height="200" />
-<img src="img/naivesolution_ch130.png" width="300" height="200" />
-
-<img src="img/nearestneighbour_a280.png" width="300" height="200" />
->>>>>>> cea2cc58e5ab08b7dd44babb1e5023dae9d9b5df
 
 
 Также сравнительная таблица, где можно посмотреть на каком тесте какое решение с каким оптимизатором(или без) работает лучше.
