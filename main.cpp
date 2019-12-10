@@ -41,14 +41,14 @@ int main(int argc, char** argv) {
                 ::cxxopts::value<std::string>()->default_value("all")
             )
             (
-                    "optimizer-name",
-                    "-- choose optimizer algorithm",
-                    ::cxxopts::value<std::string>()->default_value("")
+                "optimizer-name",
+                "-- choose optimizer algorithm",
+                ::cxxopts::value<std::string>()->default_value("")
             )
             (
-                    "optimizer-deadline",
-                    "-- deadline for optimizer in milliseconds",
-                    ::cxxopts::value<double>()->default_value("2000")
+                "optimizer-deadline",
+                "-- deadline for optimizer in milliseconds",
+                ::cxxopts::value<double>()->default_value("2000")
             )
             ("comment", "-- write a comment to your solution", ::cxxopts::value<std::string>()->default_value(""));
 
