@@ -115,7 +115,7 @@ namespace NAlgo {
         test_in >> line;
         line = NUtil::Trim(line);
         NUtil::Ensure(
-                line == "EOF",
+                line == "EOF" || line == "DISPLAY_DATA_SECTION",
                 "test doesn't contain EOF in the end"
         );
     }

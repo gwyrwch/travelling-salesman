@@ -14,24 +14,24 @@
 
 namespace NAlgo {
     ESolution ParseSolutionName(const std::string& solution_name) {
-        if (solution_name == "NearestNeighbour") {
+        if (solution_name == "NearestNeighbour" or solution_name == "NN") {
             return ESolution::NearestNeighbour;
-        } else if (solution_name == "NaiveSolution") {
+        } else if (solution_name == "NaiveSolution" or solution_name == "NS") {
             return ESolution::NaiveSolution;
-        } else if (solution_name == "MinimumSpanningTree") {
+        } else if (solution_name == "MinimumSpanningTree" or solution_name == "MST") {
             return ESolution::MinimumSpanningTree;
-        } else if (solution_name == "BranchAndBound") {
+        } else if (solution_name == "BranchAndBound" or solution_name == "BAB") {
             return ESolution::BranchAndBound;
-        } else if(solution_name == "GeneticAlgorithm") {
+        } else if(solution_name == "GeneticAlgorithm" or solution_name == "GA") {
             return ESolution::GeneticAlgorithm;
         }
         return ESolution::INVALID_SOLUTION_NAME;
     }
 
     EOptimizer ParseOptimizerName(const std::string& optimizer_name) {
-        if (optimizer_name == "LocalSearch") {
+        if (optimizer_name == "LocalSearch" or optimizer_name == "LS") {
             return EOptimizer::LocalSearch;
-        } else if (optimizer_name == "SimulatedAnnealing") {
+        } else if (optimizer_name == "SimulatedAnnealing" or optimizer_name == "SA") {
             return EOptimizer::SimulatedAnnealing;
         }
         throw;

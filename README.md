@@ -66,7 +66,7 @@ NODE_COORD_SECTION/EDGE_WEIGHT_SECTION
 
 | Параметр         | Возможные значения | Описание  |
 | :---------------:  |:-------------------|:-----|
-| `--mode`         | `run-solution`     | режимы фреймворка |
+| `--mode`         | `run-solution`, `list-optimizers`, `list-solutions`     | режимы фреймворка |
 | `--solution-name`| `NaiveSolution`, `NearestNeighbour`, `MinimumSpanningTree`, `BranchAndBound`, `GeneticAlgorithm`|   название решения |  
 |`--solution-deadline`| `1000`| дедлайн для решения в миллисекундах, `default = 3000`. для решений с отсечением по времени| 
 |`--multi`| | если указан, то решение будет работать в многопоточном режиме| 
