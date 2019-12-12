@@ -29,23 +29,20 @@ namespace NAlgo {
                 while (timer.Passed() < config.deadline) {
                     for (int l = 0; l < test.GetVertexNum(); l++)
                         for (int r = l + 1; r < test.GetVertexNum(); r++) {
-                            int prev = (l - 1 + test.GetVertexNum()) % test.GetVertexNum();
-                            int next = (r + 1) % test.GetVertexNum();
-                            std::vector<int> &p = baseline.path;
-                            double delta_h = test.EvalDistance(p[prev], p[r]) + test.EvalDistance(p[l], p[next]) -
-                                             (test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]));
-                            double prob = exp(-delta_h / T);
-                            if (delta_h < 0 || get_random_double() < prob) {
-                                currentWeight -= test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
-                                std::reverse(p.begin() + l, p.begin() + r + 1);
-                                currentWeight += test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
-                            }
-
-                            if (currentWeight < best_tour.TotalWeight()) {
-                                best_tour = baseline;
-                                best_tour.CalcTotalWeight();
-                            }
+                            make_iteration(l ,r, test, T, baseline, best_tour, currentWeight);
                         }
+                    T *= alpha;
+                }
+            } else {
+                while (timer.Passed() < config.deadline) {
+                    int l = gen() % (int)test.GetVertexNum();
+                    int r = gen() % (int)test.GetVertexNum();
+
+                    if (l > r)
+                        std::swap(l, r);
+
+                    make_iteration(l ,r, test, T, baseline, best_tour, currentWeight);
+
                     T *= alpha;
                 }
             }
@@ -62,5 +59,25 @@ namespace NAlgo {
         double get_random_double() {
             return 1. * gen() / UINT32_MAX;
         }
+
+        void make_iteration(int l ,int r, const Test &test, double T, Tour& baseline, Tour& best_tour, long long& currentWeight) {
+            int prev = (l - 1 + test.GetVertexNum()) % test.GetVertexNum();
+            int next = (r + 1) % test.GetVertexNum();
+            std::vector<int> &p = baseline.path;
+            double delta_h = test.EvalDistance(p[prev], p[r]) + test.EvalDistance(p[l], p[next]) -
+                             (test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]));
+            double prob = exp(-delta_h / T);
+            if (delta_h < 0 || get_random_double() < prob) {
+                currentWeight -= test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
+                std::reverse(p.begin() + l, p.begin() + r + 1);
+                currentWeight += test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
+            }
+
+            if (currentWeight < best_tour.TotalWeight()) {
+                best_tour = baseline;
+                best_tour.CalcTotalWeight();
+            }
+        }
+
     };
 }
