@@ -13,25 +13,32 @@
 
 
 namespace NAlgo {
-    ESolution ParseSolutionName(const std::string& solution_name) {
+    ESolution ParseSolutionName(std::string& solution_name) {
         if (solution_name == "NearestNeighbour" or solution_name == "NN") {
+            solution_name = "NearestNeighbour";
             return ESolution::NearestNeighbour;
         } else if (solution_name == "NaiveSolution" or solution_name == "NS") {
+            solution_name = "NaiveSolution";
             return ESolution::NaiveSolution;
         } else if (solution_name == "MinimumSpanningTree" or solution_name == "MST") {
+            solution_name = "MinimumSpanningTree";
             return ESolution::MinimumSpanningTree;
         } else if (solution_name == "BranchAndBound" or solution_name == "BAB") {
+            solution_name = "BranchAndBound";
             return ESolution::BranchAndBound;
         } else if(solution_name == "GeneticAlgorithm" or solution_name == "GA") {
+            solution_name = "GeneticAlgorithm";
             return ESolution::GeneticAlgorithm;
         }
         return ESolution::INVALID_SOLUTION_NAME;
     }
 
-    EOptimizer ParseOptimizerName(const std::string& optimizer_name) {
+    EOptimizer ParseOptimizerName(std::string& optimizer_name) {
         if (optimizer_name == "LocalSearch" or optimizer_name == "LS") {
+            optimizer_name = "LocalSearch";
             return EOptimizer::LocalSearch;
         } else if (optimizer_name == "SimulatedAnnealing" or optimizer_name == "SA") {
+            optimizer_name = "SimulatedAnnealing";
             return EOptimizer::SimulatedAnnealing;
         }
         throw;
@@ -56,7 +63,7 @@ namespace NAlgo {
         return version;
     }
 
-    std::unique_ptr<ISolution> MakeSolution(const std::string& solution_name, SolutionConfig config) {
+    std::unique_ptr<ISolution> MakeSolution(std::string& solution_name, SolutionConfig config) {
         ESolution solution_code = ParseSolutionName(solution_name);
         int version = GetSolutionVersion(solution_name);
 
@@ -78,7 +85,7 @@ namespace NAlgo {
         }
     }
 
-    std::unique_ptr<IOptimizer> MakeOptimizer(const std::string& optimizer_name, OptimizerConfig config) {
+    std::unique_ptr<IOptimizer> MakeOptimizer(std::string& optimizer_name, OptimizerConfig config) {
         EOptimizer optimizer_code = ParseOptimizerName(optimizer_name);
         int version = GetSolutionVersion(optimizer_name);
 

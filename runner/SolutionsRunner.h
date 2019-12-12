@@ -23,7 +23,7 @@ namespace NRunner {
     class SolutionsRunner {
     public:
         SolutionsRunner(
-            const std::string& solution_name,
+            std::string& solution_name,
             std::string _test_name,
             std::optional<std::string> optimizer_name,
             std::optional<NAlgo::OptimizerConfig> optimizer_config,
@@ -78,6 +78,8 @@ namespace NRunner {
                     out << "COMMENT: " << comment.value() << std::endl;
                 }
 
+                out << "TIME: " << result.run_time_ms << std::endl;
+
                 out << "TOUR_SECTION" << std::endl;
 
                 for (auto v : result.tour.path) {
@@ -110,6 +112,7 @@ namespace NRunner {
                 result[i].tour = new_tour;
                 result[i].optimizer_name = optimizer->optimizer_name();
                 result[i].optimizer_version = optimizer->optimizer_version();
+                std::cout << "Optimized test " << tests[i].GetTestName() << " new score " << new_tour.TotalWeight() << std::endl;
             }
             return result;
         }
@@ -123,7 +126,7 @@ namespace NRunner {
                 .tour = tour,
                 .solution_name = solution->solution_name(),
                 .solution_version = solution->solution_version(),
-                .run_time_ms = timer.Passed()
+                .run_time_ms = timer.Passed() + (optimizer ? optimizer->get_deadline() : 0)
             };
         }
 

@@ -25,6 +25,10 @@ namespace NAlgo {
             return version;
         }
 
+        double get_deadline() const {
+            return config.deadline;
+        }
+
     protected:
         int version;
         OptimizerConfig config;

@@ -26,27 +26,29 @@ namespace NAlgo {
             best_found = std::make_unique<Tour>(test);
             best_found->path = default_path;
             best_found->CalcTotalWeight();
-            current_tour = std::make_shared<Tour>(test);
+            if (test.GetVertexNum() < 7500) {
+                current_tour = std::make_shared<Tour>(test);
 
-            used.assign(test.GetVertexNum(), 0);
-            timer.Reset();
-            kill_dfs = false;
-            current_weight = 0;
-            order.resize(test.GetVertexNum());
-            iter = 0;
+                used.assign(test.GetVertexNum(), 0);
+                timer.Reset();
+                kill_dfs = false;
+                current_weight = 0;
+                order.resize(test.GetVertexNum());
+                iter = 0;
 
-            for (int v = 0; v < test.GetVertexNum(); v++) {
-                order[v].clear();
-                for (int u = 0; u < test.GetVertexNum(); u++) {
-                    if (v != u) {
-                        auto weight = test.EvalDistance(u, v);
-                        order[v].emplace_back(weight, u);
+                for (int v = 0; v < test.GetVertexNum(); v++) {
+                    order[v].clear();
+                    for (int u = 0; u < test.GetVertexNum(); u++) {
+                        if (v != u) {
+                            auto weight = test.EvalDistance(u, v);
+                            order[v].emplace_back(weight, u);
+                        }
                     }
+                    std::sort(order[v].begin(), order[v].end());
                 }
-                std::sort(order[v].begin(), order[v].end());
-            }
 
-            dfs(test, test.GetVertexNum());
+                dfs(test, test.GetVertexNum());
+            }
 
             Tour result = *best_found;
             result.CalcTotalWeight();

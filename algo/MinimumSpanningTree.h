@@ -3,6 +3,7 @@
 #include <algo/ISolution.h>
 #include <algorithm>
 #include <numeric>
+#include <lib/Timer.h>
 
 
 namespace NAlgo {
@@ -16,20 +17,27 @@ namespace NAlgo {
             Tour tour(test);
             int64_t answer = LONG_LONG_MAX;
 
-            auto min_spanning_tree = find_min_spanning_tree(test, tour);
+            std::vector<int> default_path(test.GetVertexNum());
+            std::iota(default_path.begin(), default_path.end(), 0);
+            tour.path = default_path;
+            tour.CalcTotalWeight();
+            answer = tour.TotalWeight();
 
-            for (int i = 0; i < test.GetVertexNum(); i++) {
-                Tour candidate(test);
-                dfs(i, -1, min_spanning_tree, candidate);
-                candidate.CalcTotalWeight();
+            if (test.GetVertexNum() < 7500) {
+                auto min_spanning_tree = find_min_spanning_tree(test, tour);
 
-                if (candidate.TotalWeight() < answer) {
-                    answer = candidate.TotalWeight();
-                    tour = candidate;
+                for (int i = 0; i < test.GetVertexNum(); i++) {
+                    Tour candidate(test);
+                    dfs(i, -1, min_spanning_tree, candidate);
+                    candidate.CalcTotalWeight();
+
+                    if (candidate.TotalWeight() < answer) {
+                        answer = candidate.TotalWeight();
+                        tour = candidate;
+                    }
                 }
             }
 
-            tour.CalcTotalWeight();
             return tour;
         }
 
