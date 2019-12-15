@@ -17,6 +17,11 @@ namespace NAlgo {
             return points.at(index);
         }
 
+        std::vector<Point> GetPoints() const {
+            return points;
+
+        }
+
         int GetVertexNum() const {
             return vertex_num;
         }

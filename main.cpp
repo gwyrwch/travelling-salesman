@@ -2,8 +2,76 @@
 #include <cxxopts.hpp>
 #include <runner/SolutionsRunner.h>
 
+#define __USE_GTK3__
+
+#include <boost/python.hpp>
+#include <pygobject.h>
+#include <gtkmm.h>
+
+using namespace boost::python;
+using namespace std;
+
 // ./tsp --mode run-solution --solution-name NearestNeighbour --test-name a280
 // ./tsp --mode run-solution --solution-name NearestNeighbour --test-name a280 --optimizer-name LocalSearch
+
+void DisplayInterface(std::vector<NRunner::TestResult> results) {
+    try {
+        // Python startup code
+        Py_Initialize();
+        PyRun_SimpleString("import signal");
+        PyRun_SimpleString("signal.signal(signal.SIGINT, signal.SIG_DFL)");
+
+        PyRun_SimpleString("import matplotlib\n"
+                           "matplotlib.use('GTK3Agg')");
+        PyRun_SimpleString("import matplotlib.pyplot as plt");
+        PyRun_SimpleString("fig, ax = plt.subplots(dpi=170)");
+        if (results.size() == 1) {
+            auto tour = results[0].tour;
+            std::string new_x, new_y;
+
+            auto test = tour.GetTest();
+            for (int i = 0; i <= tour.path.size(); i++) {
+                new_x += std::to_string(test.GetPoint(tour.path[i % tour.path.size()]).x) + ",";
+                new_y += std::to_string(test.GetPoint(tour.path[i % tour.path.size()]).y) + ",";
+            }
+
+            std::string plot_cmd = "plt.plot([" + new_x + "]" + ", [" + new_y + "], linewidth=0.4, marker='.', markersize=1, color=\"#673ab7\",markeredgecolor=\"black\")";
+            PyRun_SimpleString(plot_cmd.c_str());
+            PyRun_SimpleString("plt.savefig('fig.png')");
+        }
+        Py_Finalize();
+
+        // Normal Gtk startup code
+        Gtk::Main kit(0,0);
+
+        // Create our window.
+        Gtk::Window window;
+        window.set_title("TSP");
+        window.set_default_size(2400, 1400);
+
+            Gtk::ScrolledWindow scrolledWindow;
+            window.add(scrolledWindow);
+
+            Gtk::Fixed fixed;
+            scrolledWindow.add(fixed);
+
+            Gtk::Label label;
+            label.set_text("Hello world");
+            label.set_size_request(100, 50);
+            fixed.add(label);
+            fixed.move(label, 50, 100);
+
+            Gtk::Image img("./fig.png");
+            fixed.add(img);
+            fixed.move(img, 0, 0);
+
+        window.show_all();
+
+        Gtk::Main::run(window);
+    } catch( error_already_set ) {
+        PyErr_Print();
+    }
+}
 
 int main(int argc, char** argv) {
     cxxopts::Options opt_parser("TSP solver", "");
@@ -33,7 +101,7 @@ int main(int argc, char** argv) {
             (
                 "thread-count",
                 "-- amount of threads in multithreading mode",
-                ::cxxopts::value<int>()->default_value("4")
+                ::cxxopts::value<int>()->default_value("1")
             )
             (
                 "test-name",
@@ -56,7 +124,6 @@ int main(int argc, char** argv) {
 
         auto solution_name = run_solution_options["solution-name"].as<std::string>();
         auto solution_deadline = run_solution_options["solution-deadline"].as<double>();
-        auto is_multithreaded = run_solution_options["multi"].count() != 0;
         auto thread_count = run_solution_options["thread-count"].as<int>();
         auto test_name = run_solution_options["test-name"].as<std::string>();
 
@@ -82,15 +149,18 @@ int main(int argc, char** argv) {
             comment,
             {
                 .deadline = solution_deadline,
-                .is_multithreaded = is_multithreaded,
                 .thread_count = thread_count
             }
         );
+
+        std::vector<NRunner::TestResult> runResults;
         if (optimizer_name.has_value()) {
-            solutionsRunner.run_optimize_and_save();
+            runResults = solutionsRunner.run_optimize_and_save();
         } else {
-            solutionsRunner.run_and_save();
+            runResults = solutionsRunner.run_and_save();
         }
+
+        DisplayInterface(runResults);
     } else if (mode == "list-solutions"){
         std::vector<std::string> all_solutions = {
                 "NaiveSolution",

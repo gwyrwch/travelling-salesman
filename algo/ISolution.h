@@ -6,7 +6,6 @@
 namespace NAlgo {
     struct SolutionConfig {
         double deadline;
-        bool is_multithreaded;
         int thread_count;
     };
 

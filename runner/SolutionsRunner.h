@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algo/SolutionMaker.h>
+#include <algo/Distance.h>
 #include <config/DatasetConfig.h>
 #include <lib/Timer.h>
 
@@ -9,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+
 
 namespace NRunner {
     struct TestResult {
@@ -46,12 +48,16 @@ namespace NRunner {
             }
         }
 
-        void run_and_save() {
-            save(run());
+        std::vector<TestResult> run_and_save() {
+            auto testResults = run();
+            save(testResults);
+            return testResults;
         }
 
-        void run_optimize_and_save() {
-            save(run_and_optimize());
+        std::vector<TestResult> run_optimize_and_save() {
+            auto test_results = run_and_optimize();
+            save(test_results);
+            return test_results;
         }
     private:
         void save(const std::vector<TestResult>& testResults) {

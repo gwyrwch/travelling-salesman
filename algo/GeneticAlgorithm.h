@@ -85,7 +85,7 @@ namespace NAlgo {
             while (timer.Passed() < config.deadline) {
                 std::vector<Path> new_population;
 
-                if (config.is_multithreaded) {
+                if (config.thread_count != 1) {
                     size_t pool_size = current_population.size() / 2;
                     std::vector<std::future<std::pair<Path, Path>>> results;
 
