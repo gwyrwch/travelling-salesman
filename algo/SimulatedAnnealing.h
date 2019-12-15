@@ -25,11 +25,18 @@ namespace NAlgo {
 
             int64_t currentWeight = baseline.TotalWeight();
 
+            int iter = 0;
+            std::vector<std::pair<int, int>> conv;
             if (test.GetVertexNum() < 7500) {
                 while (timer.Passed() < config.deadline) {
                     for (int l = 0; l < test.GetVertexNum(); l++)
                         for (int r = l + 1; r < test.GetVertexNum(); r++) {
-                            make_iteration(l ,r, test, T, baseline, best_tour, currentWeight);
+                            make_iteration(l, r, test, T, baseline, best_tour, currentWeight);
+
+                            if (config.save_method_convergence) {
+                                conv.emplace_back(iter, best_tour.TotalWeight());
+                            }
+                            iter++;
                         }
                     T *= alpha;
                 }
@@ -44,9 +51,15 @@ namespace NAlgo {
                     make_iteration(l ,r, test, T, baseline, best_tour, currentWeight);
 
                     T *= alpha;
+
+                    if (config.save_method_convergence) {
+                        conv.emplace_back(iter, best_tour.TotalWeight());
+                    }
+                    iter++;
                 }
             }
 
+            best_tour.convergence = conv;
             return best_tour;
         }
 
@@ -77,6 +90,7 @@ namespace NAlgo {
                 best_tour = baseline;
                 best_tour.CalcTotalWeight();
             }
+
         }
 
     };

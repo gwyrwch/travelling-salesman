@@ -6,6 +6,7 @@
 namespace NAlgo {
     struct OptimizerConfig {
         double deadline;
+        bool save_method_convergence;
     };
 
     class IOptimizer {

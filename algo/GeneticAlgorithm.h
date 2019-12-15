@@ -115,7 +115,7 @@ namespace NAlgo {
                 }
                 current_population = std::vector<Path>(new_population.begin(), new_population.end());
 
-                if (iter % 10 == 0 && config.save_method_convergence) {
+                if (config.save_method_convergence) {
                     int64_t best_weight = LONG_LONG_MAX;
 
                     Tour candidate(test), best(test);

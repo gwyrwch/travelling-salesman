@@ -142,6 +142,7 @@ int main(int argc, char** argv) {
             optimizer_name = run_solution_options["optimizer-name"].as<std::string>();
             optimizer_config = NAlgo::OptimizerConfig();
             optimizer_config->deadline = run_solution_options["optimizer-deadline"].as<double>();
+            optimizer_config->save_method_convergence = save_method_convergence;
         }
 
         std::optional<std::string> comment;
