@@ -82,6 +82,8 @@ namespace NAlgo {
             ThreadPool pool(config.thread_count);
             timer.Reset();
 
+            int iter = 0;
+            std::vector<std::pair<int, int>> conv;
             while (timer.Passed() < config.deadline) {
                 std::vector<Path> new_population;
 
@@ -112,6 +114,22 @@ namespace NAlgo {
                     }
                 }
                 current_population = std::vector<Path>(new_population.begin(), new_population.end());
+
+                if (iter % 10 == 0 && config.save_method_convergence) {
+                    int64_t best_weight = LONG_LONG_MAX;
+
+                    Tour candidate(test), best(test);
+                    for (size_t i = 0; i < current_population.size(); i++) {
+                        candidate.path = current_population[i];
+                        candidate.CalcTotalWeight();
+                        if (candidate.TotalWeight() < tour.TotalWeight()) {
+                            best = candidate;
+                        }
+                    }
+                    best.CalcTotalWeight();
+                    conv.emplace_back(iter, best.TotalWeight());
+                }
+                iter++;
             }
 
             std::vector<int64_t> all_weights;
@@ -125,6 +143,7 @@ namespace NAlgo {
                 }
             }
             tour.CalcTotalWeight();
+            tour.convergence = conv;
             assert(tour.TotalWeight() != LONG_LONG_MAX);
             return tour;
         }

@@ -7,6 +7,7 @@ namespace NAlgo {
     struct SolutionConfig {
         double deadline;
         int thread_count;
+        bool save_method_convergence;
     };
 
     class ISolution {

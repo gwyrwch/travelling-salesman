@@ -35,6 +35,7 @@ namespace NAlgo {
         }
 
         std::vector<int> path;
+        std::vector<std::pair<int, int>> convergence;
     private:
         int64_t total_weight;
         Test test;

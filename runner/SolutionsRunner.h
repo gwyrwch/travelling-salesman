@@ -54,12 +54,65 @@ namespace NRunner {
             return testResults;
         }
 
+        std::vector<TestResult> run_and_save_all() {
+            auto testResults = run();
+            save(testResults);
+            save_convergence(testResults);
+            return testResults;
+        }
+
         std::vector<TestResult> run_optimize_and_save() {
             auto test_results = run_and_optimize();
             save(test_results);
             return test_results;
         }
+
+        std::vector<TestResult> run_optimize_and_save_all() {
+            auto test_results = run_and_optimize();
+            save(test_results);
+            save_convergence(test_results);
+            return test_results;
+        }
     private:
+        void save_convergence(const std::vector<TestResult>& testResults) {
+            for (auto result : testResults) {
+                std::filesystem::path path(
+                    NConfig::CacheConfig::CONVERGENCE_DIRECTORY / (
+                            result.tour.GetTestName() + "_"
+                            + solution->solution_name() + "_"
+                            + std::to_string(solution->solution_version())
+                            + ".conv"
+                    )
+                );
+                std::ofstream out(path);
+                out << "NAME: " << result.tour.GetTestName() + "_"
+                                   + result.solution_name << std::endl;
+                out << "TYPE: CONVERGENCE" << std::endl;
+                out << "DIMENSION: " << result.tour.path.size() << std::endl;
+                result.tour.CalcTotalWeight();
+                std::cout << result.tour.TotalWeight() << std::endl;
+                if (optimizer) {
+                    out << "OPTIMIZER: " << optimizer->optimizer_name() << std::endl;
+                }
+
+                if (comment.has_value()) {
+                    out << "COMMENT: " << comment.value() << std::endl;
+                }
+
+                out << "CONVERGENCE_SECTION" << std::endl;
+
+                int delta = result.tour.convergence.size() / 30;
+                for (size_t i = 0; i < result.tour.convergence.size(); i += delta) {
+                    out << result.tour.convergence[i].first
+                        << " "
+                        << result.tour.convergence[i].second
+                        << std::endl;
+                }
+
+                out << -1 << std::endl;
+            }
+        }
+
         void save(const std::vector<TestResult>& testResults) {
             for (auto result : testResults) {
                 std::filesystem::path path(

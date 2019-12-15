@@ -118,7 +118,15 @@ int main(int argc, char** argv) {
                 "-- deadline for optimizer in milliseconds",
                 ::cxxopts::value<double>()->default_value("2000")
             )
-            ("comment", "-- write a comment to your solution", ::cxxopts::value<std::string>()->default_value(""));
+            (
+                "comment",
+                "-- write a comment to your solution",
+                ::cxxopts::value<std::string>()->default_value("")
+            )
+            (
+                "save-convergence",
+                "-- if specified, then convergence of the method is saved to file"
+            );
 
         auto run_solution_options = solution_opt_parser.parse(argc, argv);
 
@@ -126,6 +134,7 @@ int main(int argc, char** argv) {
         auto solution_deadline = run_solution_options["solution-deadline"].as<double>();
         auto thread_count = run_solution_options["thread-count"].as<int>();
         auto test_name = run_solution_options["test-name"].as<std::string>();
+        auto save_method_convergence = run_solution_options["save-convergence"].count() != 0;
 
         std::optional<std::string> optimizer_name;
         std::optional<NAlgo::OptimizerConfig> optimizer_config;
@@ -149,25 +158,35 @@ int main(int argc, char** argv) {
             comment,
             {
                 .deadline = solution_deadline,
-                .thread_count = thread_count
+                .thread_count = thread_count,
+                .save_method_convergence = save_method_convergence
             }
         );
 
         std::vector<NRunner::TestResult> runResults;
-        if (optimizer_name.has_value()) {
+        if (optimizer_name.has_value() && save_method_convergence) {
+            runResults = solutionsRunner.run_optimize_and_save_all();
+            std::cout << 1 << std::endl;
+        } else if(optimizer_name.has_value()) {
             runResults = solutionsRunner.run_optimize_and_save();
+            std::cout << 2 << std::endl;
+        } else if(save_method_convergence) {
+            runResults = solutionsRunner.run_and_save_all();
+            std::cout << 3 << std::endl;
         } else {
             runResults = solutionsRunner.run_and_save();
+            std::cout << 4 << std::endl;
         }
 
-        DisplayInterface(runResults);
+
+//        DisplayInterface(runResults);
     } else if (mode == "list-solutions"){
         std::vector<std::string> all_solutions = {
-                "NaiveSolution",
-                "NearestNeighbour",
-                "BranchAndBound",
-                "MinimumSpanningTree",
-                "GeneticAlgorithm"
+            "NaiveSolution",
+            "NearestNeighbour",
+            "BranchAndBound",
+            "MinimumSpanningTree",
+            "GeneticAlgorithm"
         };
 
         std::cout << "Available solutions: " << std::endl;
@@ -176,8 +195,8 @@ int main(int argc, char** argv) {
 
     } else if (mode == "list-optimizers"){
         std::vector<std::string> all_optimizers = {
-                "LocalSearch",
-                "SimulatedAnnealing"
+            "LocalSearch",
+            "SimulatedAnnealing"
         };
 
         std::cout << "Available optimizers: " << std::endl;
