@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cxxopts.hpp>
 #include <runner/SolutionsRunner.h>
+#include <util/String.h>
 
 #define __USE_GTK3__
 
@@ -13,8 +14,32 @@ using namespace std;
 
 // ./tsp --mode run-solution --solution-name NearestNeighbour --test-name a280
 // ./tsp --mode run-solution --solution-name NearestNeighbour --test-name a280 --optimizer-name LocalSearch
+std::string read_exact_weight(std::string test_name) {
+    std::filesystem::path p = "./exact_tour_weights";
+    std::ifstream file_in(p);
 
-void DisplayInterface(std::vector<NRunner::TestResult> results) {
+    if (!file_in) {
+        throw std::runtime_error("no such file");
+    }
+
+    std::string line;
+    while (true) {
+        getline(file_in, line);
+        if (line == "-1") {
+            break;
+        }
+
+        auto tokens = NUtil::SplitAndTrim(line, ':');
+        if (tokens[0] == test_name) {
+            return tokens[1];
+        }
+    }
+
+    return "";
+}
+
+
+void DisplayInterface(std::vector<NRunner::TestResult> results, std::string exact_weight) {
     try {
         // Python startup code
         Py_Initialize();
@@ -56,14 +81,21 @@ void DisplayInterface(std::vector<NRunner::TestResult> results) {
             scrolledWindow.add(fixed);
 
             Gtk::Label label;
-            label.set_text("Hello world");
-            label.set_size_request(100, 50);
+            label.set_text(
+                        "found: "
+                        + std::to_string(results[0].tour.TotalWeight())
+                        + "\n"
+                        + "exact: "
+                        + exact_weight
+                    );
+            label.set_size_request(100, 20);
             fixed.add(label);
-            fixed.move(label, 50, 100);
+            fixed.move(label, 0, 0);
+
 
             Gtk::Image img("./fig.png");
             fixed.add(img);
-            fixed.move(img, 0, 0);
+            fixed.move(img, 0, 35);
 
         window.show_all();
 
@@ -72,6 +104,7 @@ void DisplayInterface(std::vector<NRunner::TestResult> results) {
         PyErr_Print();
     }
 }
+
 
 int main(int argc, char** argv) {
     cxxopts::Options opt_parser("TSP solver", "");
@@ -177,6 +210,11 @@ int main(int argc, char** argv) {
         } else {
             runResults = solutionsRunner.run_and_save();
             std::cout << 4 << std::endl;
+        }
+
+        if (runResults.size() == 1) {
+            std::string exact_weight = read_exact_weight(runResults[0].tour.GetTestName());
+            DisplayInterface(runResults, exact_weight);
         }
 
 
