@@ -26,7 +26,7 @@ namespace NAlgo {
             int64_t currentWeight = baseline.TotalWeight();
 
             int iter = 0;
-            std::vector<std::pair<int, int>> conv;
+            std::vector<std::pair<int, int>> conv = baseline.convergence;
             if (test.GetVertexNum() < 7500) {
                 while (timer.Passed() < config.deadline) {
                     for (int l = 0; l < test.GetVertexNum(); l++)

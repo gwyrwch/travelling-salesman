@@ -19,16 +19,18 @@ namespace NAlgo {
 
             int64_t currentWeight = baseline.TotalWeight();
 
-            while (timer.Passed() < config.deadline) {
-                for (int l = 0; l < test.GetVertexNum(); l++)
-                    for (int r = l + 1; r < test.GetVertexNum(); r++) {
+            int iter = 0;
+            bool ok = true;
+            while (timer.Passed() < config.deadline && ok) {
+                for (int l = 0; l < test.GetVertexNum() && ok; l++) {
+                    for (int r = l + 1; r < test.GetVertexNum() && ok; r++) {
                         int prev = (l - 1 + test.GetVertexNum()) % test.GetVertexNum();
                         int next = (r + 1) % test.GetVertexNum();
-                        std::vector<int>& p = baseline.path;
+                        std::vector<int> &p = baseline.path;
                         if (
-                            test.EvalDistance(p[prev], p[r]) + test.EvalDistance(p[l], p[next]) <
-                            test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next])
-                        ) {
+                                test.EvalDistance(p[prev], p[r]) + test.EvalDistance(p[l], p[next]) <
+                                test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next])
+                                ) {
                             currentWeight -= test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
                             std::reverse(p.begin() + l, p.begin() + r + 1);
                             currentWeight += test.EvalDistance(p[prev], p[l]) + test.EvalDistance(p[r], p[next]);
@@ -38,7 +40,16 @@ namespace NAlgo {
                             best_tour.CalcTotalWeight();
                             assert(best_tour.TotalWeight() == currentWeight); // fixme checking for first time
                         }
+
+                        iter++;
+                        if (iter % 5000 == 0) {
+                            if(timer.Passed() > config.deadline) {
+                                ok = false;
+                            }
+                        }
                     }
+                }
+
             }
 
             return best_tour;

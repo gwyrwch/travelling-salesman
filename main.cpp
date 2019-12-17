@@ -60,7 +60,9 @@ void DisplayInterface(std::vector<NRunner::TestResult> results, std::string exac
                 new_y += std::to_string(test.GetPoint(tour.path[i % tour.path.size()]).y) + ",";
             }
 
-            std::string plot_cmd = "plt.plot([" + new_x + "]" + ", [" + new_y + "], linewidth=0.4, marker='.', markersize=1, color=\"#673ab7\",markeredgecolor=\"black\")";
+            std::string plot_cmd = "plt.plot([" + new_x + "]" + ", [" + new_y + "], "
+                                   "linewidth=0.4, marker='.', markersize=1, "
+                                   "color=\"#673ab7\",markeredgecolor=\"black\")";
             PyRun_SimpleString(plot_cmd.c_str());
             PyRun_SimpleString("plt.savefig('fig.png')");
         }
@@ -216,7 +218,7 @@ int main(int argc, char** argv) {
             std::string exact_weight = read_exact_weight(runResults[0].tour.GetTestName());
             DisplayInterface(runResults, exact_weight);
         }
-
+//        fl417, si175, si1032, kroE100, u159, si535
 
 //        DisplayInterface(runResults);
     } else if (mode == "list-solutions"){
