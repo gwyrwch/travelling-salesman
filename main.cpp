@@ -41,7 +41,6 @@ std::string read_exact_weight(std::string test_name) {
 
 void DisplayInterface(std::vector<NRunner::TestResult> results, std::string exact_weight) {
     try {
-        // Python startup code
         Py_Initialize();
         PyRun_SimpleString("import signal");
         PyRun_SimpleString("signal.signal(signal.SIGINT, signal.SIG_DFL)");
@@ -68,36 +67,33 @@ void DisplayInterface(std::vector<NRunner::TestResult> results, std::string exac
         }
         Py_Finalize();
 
-        // Normal Gtk startup code
         Gtk::Main kit(0,0);
 
-        // Create our window.
         Gtk::Window window;
         window.set_title("TSP");
         window.set_default_size(2400, 1400);
 
-            Gtk::ScrolledWindow scrolledWindow;
-            window.add(scrolledWindow);
+        Gtk::ScrolledWindow scrolledWindow;
+        window.add(scrolledWindow);
 
-            Gtk::Fixed fixed;
-            scrolledWindow.add(fixed);
+        Gtk::Fixed fixed;
+        scrolledWindow.add(fixed);
 
-            Gtk::Label label;
-            label.set_text(
-                        "found: "
-                        + std::to_string(results[0].tour.TotalWeight())
-                        + "\n"
-                        + "exact: "
-                        + exact_weight
-                    );
-            label.set_size_request(100, 20);
-            fixed.add(label);
-            fixed.move(label, 0, 0);
+        Gtk::Label label;
+        label.set_text(
+            "found: "
+            + std::to_string(results[0].tour.TotalWeight())
+            + "\n"
+            + "exact: "
+            + exact_weight
+        );
+        label.set_size_request(100, 20);
+        fixed.add(label);
+        fixed.move(label, 0, 0);
 
-
-            Gtk::Image img("./fig.png");
-            fixed.add(img);
-            fixed.move(img, 0, 35);
+        Gtk::Image img("./fig.png");
+        fixed.add(img);
+        fixed.move(img, 0, 35);
 
         window.show_all();
 
@@ -123,7 +119,10 @@ int main(int argc, char** argv) {
         solution_opt_parser.allow_unrecognised_options();
 
         solution_opt_parser.add_options("Run options")
-            ("solution-name", "-- choose algorithm ", ::cxxopts::value<std::string>())
+            ("solution-name",
+                    "-- choose algorithm ",
+                    ::cxxopts::value<std::string>()
+            )
             (
                 "solution-deadline",
                 "-- deadline for solution in milliseconds",
@@ -202,25 +201,22 @@ int main(int argc, char** argv) {
         std::vector<NRunner::TestResult> runResults;
         if (optimizer_name.has_value() && save_method_convergence) {
             runResults = solutionsRunner.run_optimize_and_save_all();
-            std::cout << 1 << std::endl;
         } else if(optimizer_name.has_value()) {
             runResults = solutionsRunner.run_optimize_and_save();
-            std::cout << 2 << std::endl;
         } else if(save_method_convergence) {
             runResults = solutionsRunner.run_and_save_all();
-            std::cout << 3 << std::endl;
         } else {
             runResults = solutionsRunner.run_and_save();
-            std::cout << 4 << std::endl;
         }
 
         if (runResults.size() == 1) {
             std::string exact_weight = read_exact_weight(runResults[0].tour.GetTestName());
+            if (exact_weight == "")
+                throw std::runtime_error("no test with such name");
+
             DisplayInterface(runResults, exact_weight);
         }
-//        fl417, si175, si1032, kroE100, u159, si535
 
-//        DisplayInterface(runResults);
     } else if (mode == "list-solutions"){
         std::vector<std::string> all_solutions = {
             "NaiveSolution",

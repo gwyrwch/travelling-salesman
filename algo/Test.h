@@ -14,12 +14,14 @@ namespace NAlgo {
         explicit Test(const std::filesystem::path& dataset_location, const std::string& test_name);
 
         Point GetPoint(int index) const {
+            if (points.empty()) {
+                throw std::runtime_error("no points where given for the test");
+            }
             return points.at(index);
         }
 
         std::vector<Point> GetPoints() const {
             return points;
-
         }
 
         int GetVertexNum() const {
@@ -50,14 +52,16 @@ namespace NAlgo {
         std::string weight_format;
 
         /*
-         * EUC_2D test
-         * ATT test
-         * CEIL_2D test
+         * EDGE_WEIGHT_TYPE:
+         *   EUC_2D test
+         *   ATT test
+         *   CEIL_2D test
          */
         std::vector<Point> points;
 
         /*
-         * MATRIX??? test
+         * EDGE_WEIGHT_TYPE:
+         *   EXPLICIT test
          */
         std::vector<std::vector<int>> matrix;
     };
